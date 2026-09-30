@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Ulang Tahun, Mama Tersayang! ❤️</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Poppins:wght@300;400;500;600&family=Sacramento&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'warm-bg': '#fdfbf7',
+                        'soft-pink': '#fce4ec',
+                        'accent-pink': '#f8bbd0',
+                        'rose-gold': '#b76e79',
+                        'rose-gold-dark': '#8e4a54',
+                        'gold-light': '#e0a96d',
+                        'deep-rose': '#6d3039'
+                    },
+                    fontFamily: {
+                        playfair: ['Playfair Display', 'serif'],
+                        sacramento: ['Sacramento', 'cursive'],
+                        poppins: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fdfbf7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f8bbd0;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b76e79;
+        }
+
+        /* Canvas Overlay */
+        #petalCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Floating Vinyl Spin Animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin 8s linear infinite;
+        }
+
+        /* Polaroid Hover Effect */
+        .polaroid-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .polaroid-card:hover {
+            transform: translateY(-8px) rotate(1deg) scale(1.02);
+            box-shadow: 0 20px 30px rgba(183, 110, 121, 0.2);
+        }
+
+        /* Coupon Card Flip/Claim Effect */
+        .coupon-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fff0f5 100%);
+            border: 2px dashed #b76e79;
+            transition: all 0.3s ease;
+        }
+        .coupon-card.claimed {
+            background: linear-gradient(135deg, #f8bbd0 0%, #fce4ec 100%);
+            border-style: solid;
+            opacity: 0.85;
+        }
+
+        /* Pulse glowing button */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(183, 110, 121, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(183, 110, 121, 0.8); }
+        }
+        .glow-btn {
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Modal Overlay Transition */
+        .modal-fade {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-warm-bg text-gray-700 font-poppins relative min-h-screen overflow-x-hidden">
+
+    <!-- Background Petals & Particles Canvas -->
+    <canvas id="petalCanvas"></canvas>
+
+    <!-- Floating Audio Player -->
+    <div class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white/90 backdrop-blur-md p-2 pr-4 rounded-full shadow-2xl border border-soft-pink">
+        <button id="musicToggleBtn" onclick="toggleAudio()" class="w-12 h-12 rounded-full bg-rose-gold text-white flex items-center justify-center focus:outline-none transition hover:bg-rose-gold-dark shadow-md">
+            <i id="musicIcon" class="fas fa-music text-lg"></i>
+        </button>
+        <div class="text-xs">
+            <p class="font-semibold text-deep-rose" id="songTitle">Lagu Spesial Mama</p>
+            <p class="text-gray-500 text-[10px]" id="songStatus">Klik untuk memutar 🎵</p>
+        </div>
+        <!-- Audio HTML5 Tag -->
+        <!-- BISA DIGANTI: Ganti src lagu dengan URL file mp3 pilihan Anda -->
+        <audio id="bgMusic" loop preload="auto">
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=sweet-piano-112177.mp3" type="audio/mpeg">
+            Browser Anda tidak mendukung elemen audio.
+        </audio>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="relative z-20 max-w-4xl mx-auto px-4 py-8">
+
+        <!-- HERO SECTION -->
+        <section class="text-center py-12 md:py-20 flex flex-col items-center justify-center min-h-[85vh]">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-soft-pink text-rose-gold font-medium text-sm mb-4 border border-rose-gold/20 shadow-sm animate-bounce">
+                🎉 Hari Yang Sangat Spesial
+            </span>
+            <h1 class="font-playfair text-4xl sm:text-6xl md:text-7xl font-bold text-deep-rose mb-4 leading-tight">
+                Selamat Ulang Tahun,<br>
+                <span class="font-sacramento text-rose-gold text-5xl sm:text-7xl md:text-8xl font-normal block mt-2">Mama Tersayang</span>
+            </h1>
+            <p class="text-base sm:text-lg text-gray-600 max-w-xl mb-8 leading-relaxed font-light">
+                Terima kasih atas segala cinta, doa, dan pelukan hangat yang tiada hentinya. Hari ini adalah milik Mama, sosok paling berharga di dunia.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button onclick="openSurpriseModal()" class="glow-btn bg-rose-gold hover:bg-rose-gold-dark text-white font-medium px-8 py-4 rounded-full text-base sm:text-lg transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3">
+                    <i class="fas fa-gift text-xl"></i>
+                    <span>Buka Pesan Spesial</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- LETTER / UCAPAN TYPEWRITER SECTION -->
+        <section id="letterSection" class="my-16 bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-10 shadow-xl border border-soft-pink relative">
+            <div class="absolute -top-5 left-10 bg-rose-gold text-white px-5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider shadow-md">
+                💌 Surat Dari Buah Hati Mama
+            </div>
+            
+            <div class="mt-4 font-playfair text-lg sm:text-xl text-gray-800 leading-relaxed min-h-[220px]" id="typewriterBox">
+                <!-- Teks ucapan otomatis diketik di sini melalui JS -->
+            </div>
+
+            <div class="mt-6 flex justify-between items-center border-t border-soft-pink/60 pt-4">
+                <span class="font-sacramento text-2xl text-rose-gold">Dengan Seluruh Cinta, Anakmu ❤️</span>
+                <button onclick="replayTypewriter()" class="text-xs text-rose-gold hover:text-rose-gold-dark flex items-center gap-1.5 transition underline font-poppins">
+                    <i class="fas fa-redo-alt"></i> Baca Ulang
+                </button>
+            </div>
+        </section>
+
+        <!-- GALERI KENANGAN (POLAROID GRID) -->
+        <section class="my-20">
+            <div class="text-center mb-12">
+                <h2 class="font-playfair text-3xl sm:text-4xl font-bold text-deep-rose">Galeri Kenangan Indah</h2>
+                <div class="w-16 h-1 bg-rose-gold mx-auto my-3 rounded-full"></div>
+                <p class="text-sm sm:text-base text-gray-500 font-light">Momen-momen manis yang selalu abadi di dalam hati</p>
+            </div>
+
+            <!-- Grid Foto Polaroid -->
+            <!-- BISA DIGANTI: Ganti URL foto (src) dan caption dengan kenangan asli Anda dan Mama -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                
+                <!-- Foto 1 -->
+                <div class="polaroid-card bg-white p-4 rounded-xl cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80', 'Senyum Hangat Mama')">
+                    <div class="overflow-hidden rounded-lg aspect-square mb-3 bg-gray-100">
+                        <img src="foto 5.jpeg" alt="Mama" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-sacramento text-2xl text-center text-rose-gold">Senyum Tercantik Mama ✨</p>
+                </div>
+
+                <!-- Foto 2 -->
+                <div class="polaroid-card bg-white p-4 rounded-xl cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=800&q=80', 'Momen Bersama')">
+                    <div class="overflow-hidden rounded-lg aspect-square mb-3 bg-gray-100">
+                        <img src="foto 6.jpeg" alt="Momen Bersama" class="w-full h-full object-cover">
+                    </div>
+                        <p class="font-sacramento text-2xl text-center text-rose-gold">momen kebersamaan 💕</p>
+                    </div>
+
+                <!-- Foto 3 -->
+                <div class="polaroid-card bg-white p-4 rounded-xl cursor-pointer" onclick="openLightbox('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80', 'Liburan Spesial')">
+                    <div class="overflow-hidden rounded-lg aspect-square mb-3 bg-gray-100">
+                        <img src="foto 4.jpeg" alt="Liburan" class="w-full h-full object-cover">
+                    </div>
+                    <p class="font-sacramento text-2xl text-center text-rose-gold">selfie berdua 🌸</p>
+                </div>
+
+            </div>
+        </section>
+
+        
+
+        <!-- WISH BOX / DOA DARI MAMA SECTION -->
+        <section class="my-20 bg-soft-pink/50 rounded-3xl p-8 sm:p-12 border border-soft-pink text-center">
+            <h2 class="font-playfair text-3xl font-bold text-deep-rose mb-2">Harapan & Doa Untuk Mama</h2>
+            <p class="text-sm text-gray-600 mb-8 max-w-lg mx-auto">Klik tombol di bawah ini untuk mengambil kartu Doa & Keberkahan spesial untuk Mama hari ini.</p>
+
+            <button onclick="drawWishCard()" class="bg-rose-gold hover:bg-rose-gold-dark text-white font-medium px-6 py-3 rounded-full text-sm transition shadow-lg inline-flex items-center gap-2">
+                <i class="fas fa-magic"></i>
+                <span>Ambil Kartu Doa Hari Ini</span>
+            </button>
+
+            <!-- Card Result Display -->
+            <div id="wishDisplay" class="hidden mt-8 bg-white p-6 rounded-2xl shadow-md max-w-md mx-auto transition-all duration-500 border border-rose-gold/30">
+                <div class="text-3xl mb-2 text-rose-gold" id="wishIcon">✨</div>
+                <h4 class="font-playfair text-xl font-bold text-deep-rose mb-2" id="wishTitle">Doa Kebahagiaan</h4>
+                <p class="text-sm text-gray-600 italic" id="wishText">"Semoga Mama selalu diberikan kesehatan yang sempurna, kebahagiaan hati yang tak terhingga, dan kedamaian di setiap langkah."</p>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center py-12 border-t border-soft-pink">
+            <p class="font-sacramento text-3xl text-rose-gold mb-2">Dibuat dengan sepenuh hati ❤️</p>
+            <p class="text-xs text-gray-400">Selamat Ulang Tahun Mama • Selalu Ada Untukmu</p>
+        </footer>
+
+    </main>
+
+    <!-- SURPRISE MODAL -->
+    <div id="surpriseModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-8 text-center shadow-2xl transform scale-90 transition-transform duration-300 border-2 border-soft-pink relative">
+            <button onclick="closeSurpriseModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 w-8 h-8 rounded-full flex items-center justify-center">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            
+            <div class="w-20 h-20 bg-soft-pink text-rose-gold rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                🎂
+            </div>
+            
+            <h3 class="font-playfair text-2xl font-bold text-deep-rose mb-2">Kejutan Manis Untuk Mama!</h3>
+            <p class="text-sm text-gray-600 leading-relaxed mb-6">
+                Selamat Ulang Tahun, Mama! Di hari istimewa ini, semoga kesehatan, kedamaian, dan kebahagiaan selalu memeluk Mama. Terima kasih sudah menjadi sosok terhebat bagi kami semua!
+            </p>
+
+            <button onclick="closeSurpriseModal(); scrollToLetter();" class="w-full bg-rose-gold hover:bg-rose-gold-dark text-white font-medium py-3 rounded-full text-sm transition">
+                Baca Surat Cinta Mama 💕
+            </button>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX MODAL FOR GALLERY -->
+    <div id="lightboxModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeLightbox()">
+        <div class="relative max-w-3xl w-full text-center" onclick="event.stopPropagation()">
+            <img id="lightboxImg" src="" alt="Zoom Foto" class="max-h-[80vh] mx-auto rounded-xl shadow-2xl border-4 border-white">
+            <p id="lightboxCaption" class="font-sacramento text-3xl text-white mt-4"></p>
+            <button onclick="closeLightbox()" class="absolute -top-12 right-0 text-white hover:text-gray-300 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================
+           1. JAVASCRIPT TYPEWRITER EFFECT
+           ========================================== */
+        // BISA DIGANTI: Silakan sesuaikan isi teks ucapan di bawah ini
+        const letterText = "Mama yang tersayang,\n\nTerima kasih telah menjadi rumah tempatku pulang, pelindung di saat aku ragu, dan alasan di balik setiap keberhasilanku. Senyuman Mama adalah kebahagiaan terbesar dalam hidupku.\n\nDi hari ulang tahun Mama ini, aku berdoa agar Tuhan selalu menjaga Mama dalam kesehatan, memberikan umur yang berkah, dan melimpahkan ketenangan di setiap hari yang Mama jalani.\n\nSelamat Ulang Tahun, Mama... Aku sangat mencintaimu, hari ini dan selamanya. ❤️";
+
+        let typeIdx = 0;
+        let isTyping = false;
+        const speed = 45; // Kecepatan mengetik dalam milidetik
+
+        function typeWriter() {
+            const box = document.getElementById("typewriterBox");
+            if (typeIdx < letterText.length) {
+                const char = letterText.charAt(typeIdx);
+                if (char === '\n') {
+                    box.innerHTML += '<br>';
+                } else {
+                    box.innerHTML += char;
+                }
+                typeIdx++;
+                setTimeout(typeWriter, speed);
+            } else {
+                isTyping = false;
+            }
+        }
+
+        function startTypewriter() {
+            const box = document.getElementById("typewriterBox");
+            box.innerHTML = "";
+            typeIdx = 0;
+            isTyping = true;
+            typeWriter();
+        }
+
+        function replayTypewriter() {
+            if (!isTyping) {
+                startTypewriter();
+            }
+        }
+
+
+        /* ==========================================
+           2. AUDIO / MUSIC PLAYER LOGIC
+           ========================================== */
+        const bgMusic = document.getElementById("bgMusic");
+        const musicToggleBtn = document.getElementById("musicToggleBtn");
+        const musicIcon = document.getElementById("musicIcon");
+        const songStatus = document.getElementById("songStatus");
+        let isPlaying = false;
+
+        function toggleAudio() {
+            if (isPlaying) {
+                bgMusic.pause();
+                musicIcon.className = "fas fa-music text-lg";
+                musicToggleBtn.classList.remove("animate-spin-slow");
+                songStatus.innerText = "Klik untuk memutar 🎵";
+                isPlaying = false;
+            } else {
+                bgMusic.play().then(() => {
+                    musicIcon.className = "fas fa-compact-disc text-lg";
+                    musicToggleBtn.classList.add("animate-spin-slow");
+                    songStatus.innerText = "Sedang Memutar ✨";
+                    isPlaying = true;
+                }).catch(err => {
+                    console.log("Autoplay blocked or audio load error:", err);
+                });
+            }
+        }
+
+
+        /* ==========================================
+           3. SURPRISE MODAL & CONFETTI
+           ========================================== */
+        function openSurpriseModal() {
+            const modal = document.getElementById("surpriseModal");
+            modal.classList.remove("opacity-0", "pointer-events-none");
+            modal.querySelector('div').classList.remove("scale-90");
+            modal.querySelector('div').classList.add("scale-100");
+
+            // Coba putar musik otomatis saat tombol diklik
+            if (!isPlaying) {
+                toggleAudio();
+            }
+
+            // Jalankan animasi Confetti
+            triggerConfetti();
+        }
+
+        function closeSurpriseModal() {
+            const modal = document.getElementById("surpriseModal");
+            modal.classList.add("opacity-0", "pointer-events-none");
+            modal.querySelector('div').classList.remove("scale-100");
+            modal.querySelector('div').classList.add("scale-90");
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                // Semburan confetti dari dua sisi
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function scrollToLetter() {
+            document.getElementById("letterSection").scrollIntoView({ behavior: 'smooth' });
+        }
+
+
+        /* ==========================================
+           4. GALLERY LIGHTBOX MODAL
+           ========================================== */
+        function openLightbox(imgSrc, caption) {
+            const modal = document.getElementById("lightboxModal");
+            document.getElementById("lightboxImg").src = imgSrc;
+            document.getElementById("lightboxCaption").innerText = caption;
+            modal.classList.remove("opacity-0", "pointer-events-none");
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById("lightboxModal");
+            modal.classList.add("opacity-0", "pointer-events-none");
+        }
+
+
+        /* ==========================================
+           5. KUPON KASIH SAYANG CLAIM LOGIC
+           ========================================== */
+        function claimCoupon(id, title) {
+            const card = document.getElementById(id);
+            if (!card.classList.contains("claimed")) {
+                card.classList.add("claimed");
+                card.innerHTML += `<div class="absolute top-2 right-2 bg-rose-gold text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Sudah Diklaim ✅</div>`;
+                
+                // Pemicu efek confetti kecil saat klaim kupon
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 30,
+                        spread: 50,
+                        origin: { y: 0.8 }
+                    });
+                }
+            }
+        }
+
+
+        /* ==========================================
+           6. WISH CARD RANDOMIZER
+           ========================================== */
+        const wishes = [
+            {
+                icon: "🌟",
+                title: "Doa Kesehatan & Kedamaian",
+                text: "Semoga Mama selalu dilindungi kesehatan yang fit, tidur yang nyenyak setiap malam, dan hari-hari yang tenang bahagia."
+            },
+            {
+                icon: "🌸",
+                title: "Doa Kebahagiaan Jiwa",
+                text: "Semoga setiap senyuman yang Mama berikan kepada orang lain berbalas kebahagiaan berlipat ganda untuk Mama sendiri."
+            },
+            {
+                icon: "💐",
+                title: "Doa Kelimpahan Berkah",
+                text: "Semoga rezeki, keberkahan, dan kasih sayang selalu mengalir tanpa henti menyelimuti kehidupan Mama."
+            },
+            {
+                icon: "👑",
+                title: "Ratu Terbaik Kami",
+                text: "Terima kasih sudah menjadi wanita terhebat. Semoga semua impian dan harapan Mama yang belum terwujud segera digantikan dengan yang lebih indah."
+            }
+        ];
+
+        function drawWishCard() {
+            const display = document.getElementById("wishDisplay");
+            const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+
+            document.getElementById("wishIcon").innerText = randomWish.icon;
+            document.getElementById("wishTitle").innerText = randomWish.title;
+            document.getElementById("wishText").innerText = `"${randomWish.text}"`;
+
+            display.classList.remove("hidden");
+            
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 25,
+                    spread: 40,
+                    origin: { y: 0.7 }
+                });
+            }
+        }
+
+
+        /* ==========================================
+           7. CANVAS ANIMATION: FALLING PETALS
+           ========================================== */
+        const canvas = document.getElementById('petalCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class Petal {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height - height;
+                this.size = Math.random() * 8 + 6;
+                this.speedY = Math.random() * 1.2 + 0.8;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 0.02 - 0.01;
+                this.color = ['#f8bbd0', '#fce4ec', '#b76e79', '#f48fb1'][Math.floor(Math.random() * 4)];
+                this.opacity = Math.random() * 0.6 + 0.3;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += Math.sin(this.angle) * 0.5;
+                this.angle += 0.01;
+
+                if (this.y > height) {
+                    this.y = -10;
+                    this.x = Math.random() * width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                
+                // Draw petal shape
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-this.size, -this.size, -this.size, this.size, 0, this.size * 1.5);
+                ctx.bezierCurveTo(this.size, this.size, this.size, -this.size, 0, 0);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        const petals = Array.from({ length: 30 }, () => new Petal());
+
+        function animatePetals() {
+            ctx.clearRect(0, 0, width, height);
+            petals.forEach(petal => {
+                petal.update();
+                petal.draw();
+            });
+            requestAnimationFrame(animatePetals);
+        }
+
+        // Initialize on Load
+        window.onload = function() {
+            animatePetals();
+            startTypewriter();
+        };
+    </script>
+</body>
+</html>
